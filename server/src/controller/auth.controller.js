@@ -1,14 +1,12 @@
 import bcrypt from "bcryptjs";
-import   User  from "../model/user.model.js";
+import User from "../model/user.model.js";
 import { generateToken } from "../utils/generateTokken.js";
-import sendOtp from "../lib/nodemailer.js"
+import sendOtp from "../lib/nodemailer.js";
 
-//temp storage for pending signup
-
+// Temp storage for pending signup
 const pendingUsers = new Map();
 
-//signup
-
+// SIGNUP
 export const signup = async (req, res) => {
   const { fullname, email, password } = req.body;
 
@@ -26,8 +24,7 @@ export const signup = async (req, res) => {
       });
     }
 
-    //check if the user is already exists or not
-
+    // Check if the user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({
@@ -36,15 +33,16 @@ export const signup = async (req, res) => {
       });
     }
 
-    //hash the password
-
+    // Hash the password
     const salt = await bcrypt.genSalt(13);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    //generated the otp
+    // Create username (moved before using it)
+    const username = email.split("@")[0];
 
+    // Generate the OTP
     const verifyOtp = Math.floor(100000 + Math.random() * 900000);
-    const verifyOtpExpiry = Date.now() + 10 * 60 * 1000; //10 minutes
+    const verifyOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
 
     pendingUsers.set(email, {
       fullname,
@@ -55,12 +53,7 @@ export const signup = async (req, res) => {
       verifyOtpExpiry,
     });
 
-
-    // Create username 
-    const username = email.split("@")[0];
-
-    //send the otp to user email
-
+    // Send the OTP to user email
     await sendOtp(email, verifyOtp);
 
     res.status(200).json({
@@ -73,30 +66,31 @@ export const signup = async (req, res) => {
   }
 };
 
-//verify otp
- export const verifyOtp = async (req, res) => {
-    const {email, otp} = req.body;
+// VERIFY OTP
+export const verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
 
-    try {
-        if(!email || !otp){
-            res.status(400).json({
-                success:false,
-                message:"All fields are required.",
-             })
-        }
+  try {
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required.",
+      });
+    }
 
-        // check pending user 
-        const pendingUser = pendingUsers.get(email);
-         if (!pendingUser) {
+    // Check pending user
+    const pendingUser = pendingUsers.get(email);
+    if (!pendingUser) {
       return res.status(400).json({ message: "No pending signup found or already verified" });
     }
 
-  // Validate OTP
+    // Validate OTP
     if (pendingUser.verifyOtp.toString() !== otp.toString()) {
       return res.status(400).json({ message: "Invalid OTP!!" });
     }
 
-    if (pendingUser.verifyOtpExpireAT < Date.now()) {
+    // Fixed: verifyOtpExpiry instead of verifyOtpExpireAT
+    if (pendingUser.verifyOtpExpiry < Date.now()) {
       pendingUsers.delete(email);
       return res.status(400).json({ message: "OTP Expired!!" });
     }
@@ -106,9 +100,8 @@ export const signup = async (req, res) => {
       fullname: pendingUser.fullname,
       email: pendingUser.email,
       username: pendingUser.username,
-      profilePics: pendingUser.profilePics,
       password: pendingUser.hashedPassword,
-      isVerified: true,
+      isAccountVerified: true,
     });
 
     // Cleanup pending user
@@ -131,7 +124,7 @@ export const signup = async (req, res) => {
   }
 };
 
-// ------------------- LOGIN -------------------
+// LOGIN
 export const login = async (req, res) => {
   const { password, email } = req.body;
   try {
@@ -154,14 +147,6 @@ export const login = async (req, res) => {
       email: user.email,
       fullName: user.fullname,
       username: user.username,
-      bio: user.bio,
-      location: user.location,
-      profilePics: user.profilePics,
-      cover_photo: user.cover_photo,
-      followers: user.followers,
-      following: user.following,
-      connections: user.connections,
-      connectionsRequest: user.connectionRequests,
       token,
     });
   } catch (error) {
@@ -170,7 +155,7 @@ export const login = async (req, res) => {
   }
 };
 
-// ------------------- LOGOUT -------------------
+// LOGOUT
 export const logout = async (req, res) => {
   try {
     res.cookie("jwt", "", {
@@ -186,7 +171,7 @@ export const logout = async (req, res) => {
   }
 };
 
-// ------------------- FORGOT PASSWORD -------------------
+// FORGOT PASSWORD
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
@@ -198,23 +183,20 @@ export const forgotPassword = async (req, res) => {
       return res.status(400).json({ message: "User not found!!" });
     }
 
-    const reSetOtp = Math.floor(100000 + Math.random() * 900000);
-    const reSetOtpExpireAT = Date.now() + 10 * 60 * 1000;
+    const resetOtp = Math.floor(100000 + Math.random() * 900000);
+    const resetOtpExpireAt = Date.now() + 10 * 60 * 1000;
 
-    user.resetPasswordToken = reSetOtp;
-    user.resetPasswordExpire = reSetOtpExpireAT;
+    user.resetOtp = resetOtp;
+    user.reSetOtpExpireAT = resetOtpExpireAt;
     await user.save();
-    await sendResetPasswordEmail(email, reSetOtp);
+    await sendOtp(email, resetOtp);
 
     res.status(200).json({
       message: "OTP sent to your email",
-      data: { email, reSetOtp },
+      data: { email, resetOtp },
     });
   } catch (error) {
     console.log("ForgotPassword Error:", error);
     res.status(500).json({ message: "Internal Server Error!!" });
   }
 };
-
-
-    

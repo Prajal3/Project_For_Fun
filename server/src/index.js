@@ -1,35 +1,24 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from "cors";
-
 import cookieparser from "cookie-parser";
 
 import { connectDb } from "./db/dbConnection.js";
 
-//routes import 
+// Routes import 
 import authRouters from "./routes/auth.routes.js"; 
 
-
-
-
-
-
-
-dotenv.config({quiet: true});
-
-
+dotenv.config({ quiet: true });
 
 const port = process.env.PORT || 5000;
 const app = express();
 
-
-
-
-
-
-
-
-
+// Define allowed origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  // Add your production URLs here
+];
 
 // CORS configuration
 app.use(cors({
@@ -50,21 +39,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieparser());
 
-
-
 // Routes
-app.use("/api/auth", authRouters);;
-
-
-
-
-
-
-
-
-
+app.use("/api/auth", authRouters);
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-    connectDb();
+  console.log(`Server is running on port ${port}`);
+  connectDb();
 });
