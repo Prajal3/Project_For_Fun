@@ -1,28 +1,40 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth:{
-       user: process.env.SMPT_USER,
-       pass: process.env.SMPT_PASSWORD,
-    }
-});
-
 const sendOtp = async (email, otp) => {
+    // Debug logging
+    console.log('Environment check:');
+    console.log('SMTP_USER:', process.env.SMTP_USER);
+    console.log('SMTP_PASSWORD:', process.env.SMTP_PASSWORD ? '***exists***' : 'MISSING');
+    console.log('SENDER_EMAIL:', process.env.SENDER_EMAIL);
 
-    const mailOptions ={
-        from: process.env.SENDER_EMAIL,
-        to:email,
-        subject:"OTP Verification",
-        text:`Your OTP for verification is ${otp}. Please don't share it with anyone.`
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
+        console.error('ERROR: SMTP credentials are missing from environment variables');
+        throw new Error('SMTP credentials not configured');
     }
 
-     try {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASSWORD,
+        }
+    });
+
+    const mailOptions = {
+        from: process.env.SENDER_EMAIL,
+        to: email,
+        subject: "OTP Verification",
+        text: `Your OTP for verification is ${otp}. Please don't share it with anyone.`
+    };
+
+    try {
         const info = await transporter.sendMail(mailOptions);
-        console.log("Email sent:", info.response);
+        console.log("Email sent successfully:", info.response);
+        return info;
     } catch (error) {
         console.error("Error sending email:", error);
+        throw error;
     }
-}
+};
 
 export default sendOtp;
