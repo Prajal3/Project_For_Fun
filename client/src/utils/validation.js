@@ -1,4 +1,4 @@
-
+// Email validation
 export const validateEmail = (email) => {
   const errors = [];
   
@@ -30,6 +30,13 @@ export const validatePassword = (password) => {
     return { isValid: false, errors };
   }
   
+  if (!password.trim()) {
+    errors.push("Password cannot be empty");
+  }
+  
+  if (password.length < 6) {
+    errors.push("Password must be at least 6 characters long");
+  }
   
   if (errors.length > 0) {
     return { isValid: false, errors };
@@ -77,7 +84,7 @@ export const validateFullName = (fullName) => {
 export const validateOTP = (otp) => {
   const errors = [];
   
-  console.log('validateOTP input:', otp, 'Type:', typeof otp, 'Length:', otp?.length); // Debug log
+  console.log('validateOTP input:', otp, 'Type:', typeof otp, 'Length:', otp?.length);
   
   if (!otp) {
     errors.push("Verification code is required");
@@ -90,7 +97,7 @@ export const validateOTP = (otp) => {
   }
   
   const trimmedOTP = otp.trim();
-  console.log('Trimmed OTP:', trimmedOTP, 'Regex test:', /^\d{6}$/.test(trimmedOTP)); // Debug log
+  console.log('Trimmed OTP:', trimmedOTP, 'Regex test:', /^\d{6}$/.test(trimmedOTP));
   
   if (!/^\d{6}$/.test(trimmedOTP)) {
     errors.push("Verification code must be exactly 6 digits");

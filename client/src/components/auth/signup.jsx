@@ -35,8 +35,8 @@ const Signup = () => {
   }
 
   try {
-    await api.post("/auth/send-otp", {
-      fullName,
+    await api.post("/auth/signup", {
+      fullname: fullName,
       email,
       password,
     });
@@ -74,7 +74,6 @@ const Signup = () => {
             className="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            required
           />
 
           {/* Email */}
@@ -84,7 +83,6 @@ const Signup = () => {
             className="w-full p-3 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
           />
 
           {/* Password with toggle */}
@@ -95,7 +93,6 @@ const Signup = () => {
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
             <button
               type="button"

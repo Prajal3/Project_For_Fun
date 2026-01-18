@@ -15,25 +15,24 @@ const VerifyOtp = () => {
   const [otp, setOtp] = useState("");
 
   const handleVerifyOtp = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const { isValid, errors } = validateOTP(otp);
+    const { isValid, errors } = validateOTP(otp);
 
-  if (!isValid) {
-    toast.error(errors[0]);
-    return;
-  }
+    if (!isValid) {
+      toast.error(errors[0]);
+      return;
+    }
 
-  try {
-    await api.post("/auth/verify-otp", { email, otp });
+    try {
+      await api.post("/auth/verifyOtp", { email, otp });
 
-    toast.success("Account created successfully 🎉");
-    setTimeout(() => navigate("/"), 1500);
-  } catch (err) {
-    toast.error(err.response?.data?.message || "Invalid OTP");
-  }
-};
-
+      toast.success("Account created successfully 🎉");
+      setTimeout(() => navigate("/"), 1500);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Invalid OTP");
+    }
+  };
 
   // auto move focus + combine OTP
   const handleOtpChange = (e, index) => {
