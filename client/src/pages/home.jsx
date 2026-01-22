@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { LogOut, MessageSquare, Globe, Video } from "lucide-react";
+import { AuthContex } from "../context/authContex";
 
 const Home = () => {
-  const [user] = useState({
-    name: "Alex Johnson",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
-  });
+  const navigate = useNavigate();
+  const { currentUser, logout } = useContext(AuthContex);
 
-  const [onlineUsers] = useState(1847);
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/"); 
+    }
+  }, [currentUser, navigate]);
+
+  const onlineUsers = 1847;
 
   const chatModes = [
     {
@@ -37,24 +43,28 @@ const Home = () => {
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/";
+    logout();
+    navigate("/");
   };
+
+  // Show loading or nothing while redirecting
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-indigo-600 via-purple-600 to-pink-600 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="w-16 h-16 rounded-full border-4 border-white shadow-lg"
-            />
+            <div className="w-16 h-16 rounded-full border-4 border-white shadow-lg bg-indigo-400 flex items-center justify-center text-white text-2xl font-bold">
+              {currentUser.fullname?.charAt(0).toUpperCase() || "U"}
+            </div>
             <div>
-              <h2 className="text-xl font-bold text-white">{user.name}</h2>
+              <h2 className="text-xl font-bold text-white">
+                {currentUser.fullname || "User"}
+              </h2>
               <p className="text-white/80 text-sm">Ready to chat!</p>
             </div>
           </div>
@@ -126,14 +136,9 @@ const Home = () => {
         {/* Random Chat */}
         <div className="flex justify-center">
           <button className="px-8 py-4 bg-linear-to-r from-indigo-600 to-pink-600 rounded-full text-white font-bold text-lg hover:scale-105 transition">
-            <span className="flex items-center gap-3">
-              
-              Random Chat Now
-              
-            </span>
+            <span className="flex items-center gap-3">Random Chat Now</span>
           </button>
         </div>
-
       </div>
     </div>
   );

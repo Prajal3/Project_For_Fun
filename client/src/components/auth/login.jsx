@@ -3,60 +3,50 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { Eye, EyeOff, MessageCircle } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
-import api from "../../api/axios";
 import { validateLoginForm } from "../../utils/validation";
 import { AuthContex } from "../../context/authContex";
 
-
 const Login = () => {
   const navigate = useNavigate();
-  const {login, currentUser} = useContext(AuthContex);
+  const { login } = useContext(AuthContex);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
- const handleLogin = async (e) => {
-  e.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  const { isValid, errors } = validateLoginForm({
-    email,
-    password,
-  });
+    const { isValid, errors } = validateLoginForm({
+      email,
+      password,
+    });
 
-  if (!isValid) {
-    const firstError =
-      errors.email?.[0] || errors.password?.[0];
-    toast.error(firstError);
-    return;
-  }
+    if (!isValid) {
+      const firstError = errors.email?.[0] || errors.password?.[0];
+      toast.error(firstError);
+      return;
+    }
 
-  try {
-    const res = await api.post("/auth/login", { email, password });
-
-    toast.success("Welcome back 👋");
-    localStorage.setItem("token", res.data.token);
-
-    setTimeout(() => navigate("/home"), 1500);
-  } catch (error) {
-    toast.error(error.response?.data?.message || "Login failed");
-  }
-};
-
+    try {
+      await login({ email, password });
+      toast.success("Welcome back 👋");
+      setTimeout(() => navigate("/home"), 1500);
+    } catch (error) {
+      // Error already handled in context
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-600 via-purple-600 to-pink-600">
       <div className="bg-white/90 backdrop-blur-xl p-8 rounded-2xl shadow-2xl w-full max-w-sm">
-
         {/* Logo / Title */}
         <div className="flex flex-col items-center mb-6">
           <div className="bg-indigo-600 p-3 rounded-full mb-3">
             <MessageCircle className="text-white w-7 h-7" />
           </div>
           <h2 className="text-2xl font-bold">Chat Login</h2>
-          <p className="text-sm text-gray-500">
-            Sign in to continue chatting
-          </p>
+          <p className="text-sm text-gray-500">Sign in to continue chatting</p>
         </div>
 
         <form onSubmit={handleLogin}>
@@ -100,7 +90,7 @@ const Login = () => {
 
         {/* Signup */}
         <p className="text-center text-sm mt-5">
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <span
             className="text-indigo-600 font-semibold cursor-pointer hover:underline"
             onClick={() => navigate("/signup")}
