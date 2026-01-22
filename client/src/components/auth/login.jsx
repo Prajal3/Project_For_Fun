@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { Eye, EyeOff, MessageCircle } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
 import api from "../../api/axios";
 import { validateLoginForm } from "../../utils/validation";
+import { AuthContex } from "../../context/authContex";
 
 
 const Login = () => {
   const navigate = useNavigate();
+  const {login, currentUser} = useContext(AuthContex);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
