@@ -54,7 +54,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-indigo-600 via-purple-600 to-pink-600 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto">+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">

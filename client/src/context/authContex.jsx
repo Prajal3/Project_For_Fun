@@ -14,7 +14,6 @@ export const AuthContexProvider = ({ children }) => {
     try {
       const res = await api.post("/auth/login", inputs);
       
-      // Extract user data - adjust based on your API response structure
       const userData = res.data.user || res.data;
       const token = res.data.token;
       
