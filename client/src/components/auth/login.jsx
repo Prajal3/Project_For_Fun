@@ -35,7 +35,7 @@ const Login = () => {
     setIsLoading(true);
     try {
       await login({ email, password });
-      toast.success("Welcome back ✦");
+      toast.success("Welcome back to BhetGhat ");
       setTimeout(() => navigate("/home"), 1500);
     } catch {
       // handled in context
@@ -281,7 +281,7 @@ const Login = () => {
           {/* Heading */}
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
             <h1 className="auth-serif" style={{ fontSize: 32, color: '#fff', fontWeight: 400, margin: '0 0 8px', lineHeight: 1.15 }}>
-              Welcome back
+              Welcome back to BhetGhat
             </h1>
             <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: 14, margin: 0, fontWeight: 300 }}>
               Sign in to continue your conversations

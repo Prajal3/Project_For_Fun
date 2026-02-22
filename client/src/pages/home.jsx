@@ -63,7 +63,7 @@ const Home = () => {
             </div>
             <div>
               <p className="text-white font-semibold text-sm">{displayName}</p>
-              <p className="text-white/40 text-xs">Welcome back</p>
+              <p className="text-white/40 text-xs">Welcome back to BhetGhat</p>
             </div>
           </div>
 
@@ -105,7 +105,7 @@ const Home = () => {
                 strangers.
               </span>
               <br />
-              Make connections.
+              Make connections on BhetGhat.
             </h1>
             <p className="text-white/40 text-lg max-w-md mx-auto">
               Instant, anonymous chats with real people from every corner of the world.
@@ -149,16 +149,6 @@ const Home = () => {
               );
             })}
           </div>
-
-          {/* Quick random start */}
-          <button
-            onClick={() => navigate("/video")}
-            className="flex items-center gap-3 px-8 py-4 rounded-2xl text-white font-bold text-base transition hover:scale-105 active:scale-95 shadow-2xl shadow-violet-900/40"
-            style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7, #ec4899)" }}
-          >
-            <Zap size={20} />
-            Quick Random Call
-          </button>
         </main>
       </div>
     </div>
