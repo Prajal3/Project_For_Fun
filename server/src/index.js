@@ -1,48 +1,37 @@
-import express from 'express';
-import dotenv from 'dotenv';
+import express from "express";
+import http from "http";
 import cors from "cors";
-import cookieparser from "cookie-parser";
-
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 import { connectDb } from "./db/dbConnection.js";
+import authRoutes from "./routes/auth.routes.js";
+import { initSocket } from "./socket/socket.io.js";
 
-// Routes import 
-import authRouters from "./routes/auth.routes.js"; 
+dotenv.config();
 
-dotenv.config({ quiet: true });
-
-const port = process.env.PORT || 5000;
 const app = express();
+const server = http.createServer(app);
 
-// Define allowed origins
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5173',
-  // Add your production URLs here
-];
+// Init socket
+initSocket(server);
 
-// CORS configuration
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (e.g., mobile apps or curl)
-    if (!origin) return callback(null, true);
-    // Check if the request origin is in the allowedOrigins list
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  credentials: true,
-}));
-
+// Middleware
 app.use(express.json());
-app.use(cookieparser());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 // Routes
-app.use("/api/auth", authRouters);
+app.use("/api/auth", authRoutes);
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  connectDb();
+const PORT = process.env.PORT || 5000;
+
+connectDb().then(() => {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });
